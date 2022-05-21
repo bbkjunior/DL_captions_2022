@@ -75,6 +75,9 @@ val_loader = torch.utils.data.DataLoader(
     CaptionDataset(data_folder, data_name, 'VAL', transform=transforms.Compose([normalize])),
     batch_size=batch_size, shuffle=True, num_workers=workers, pin_memory=True)
 
+save_name = 'enlarge_resnet.json'
+training_track = {'loss':[],'bleu':[]}
+
 # Epochs
 for epoch in range(start_epoch, epochs):
 
@@ -97,13 +100,18 @@ for epoch in range(start_epoch, epochs):
           print_freq=print_freq, grad_clip=grad_clip)
 
     # One epoch's validation
-    recent_bleu4 = validate(val_loader=val_loader,
+    recent_bleu4, loss = validate(val_loader=val_loader,
                             encoder=encoder,
                             decoder=decoder,
                             criterion=criterion,
                             alpha_c=alpha_c,
                             print_freq=print_freq,
                             word_map=word_map)
+
+    training_track['bleu'].append(recent_bleu4)
+    training_track['loss'].append(loss)
+    with open(save_name, 'w') as f:
+        json.dump(training_track, f)
 
     # Check if there was an improvement
     is_best = recent_bleu4 > best_bleu4

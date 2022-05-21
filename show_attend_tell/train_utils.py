@@ -17,9 +17,8 @@ def accuracy_adj(scores, targets):
     correct_total = correct.view(-1).float().sum()  # 0D tensor
     #     print("correct_total", correct_total)
 
-    total_preds = targets.shape[0 ] *targets.shape[1]
+    total_preds = targets.shape[0] *targets.shape[1]
     #     print("total",total_preds)
-
     #     raise Exception ("STOP")
 
     return correct_total.item() * (100.0 / total_preds)
@@ -248,4 +247,4 @@ def validate(val_loader, encoder, decoder, criterion,
                 top5=top5accs,
                 bleu=bleu4))
 
-    return bleu4
+    return bleu4, losses.avg
